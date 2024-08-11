@@ -8,12 +8,7 @@ class IAMPage extends StatefulWidget {
 }
 
 class _IAMPageState extends State<IAMPage> {
-  final List<String> _affirmations = [
-    'testrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr',
-    'testtworrrrrrrrrrrrrrrrrrrrr',
-    'testthreerrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr',
-    'testfoutrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr'
-  ];
+  final List<String> _affirmations = [];
 
   // Track favorite status for each affirmation
   List<bool> _isFavorite = [false, false, false, false];
@@ -24,10 +19,12 @@ class _IAMPageState extends State<IAMPage> {
     getAffirmations();
   }
 
+  Future<void> addLiked() async {}
+
   Future<void> getAffirmations() async {
-    var url = 'http://10.0.2.2:3000/data';
+    var url = 'http://10.0.2.2:3000/feed';
     final response = await http.get(Uri.parse(url));
-    final responseString = response.body.toString();
+    final responseString = response.body
     setState(() {
       _affirmations.add(responseString);
       _isFavorite.add(false); // Initialize favorite status for new affirmation

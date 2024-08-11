@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zenaura/nav.dart';
 
 void main() {
@@ -7,6 +8,12 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
+  //intialize device
+  Future<void> _saveUserAndDevice() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? deviceId = prefs.getString('deviceId');
+  }
 
   // This widget is the root of your application.
   @override
