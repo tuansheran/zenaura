@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:zenaura/widgets/affirmation.dart';
 import 'package:http/http.dart' as http;
@@ -8,10 +11,9 @@ class IAMPage extends StatefulWidget {
 }
 
 class _IAMPageState extends State<IAMPage> {
-  final List<String> _affirmations = [];
-
-  // Track favorite status for each affirmation
-  List<bool> _isFavorite = [false, false, false, false];
+  List<String> _affirmations = [];
+  bool _isFavorite = false;
+  String _deviceId = '';
 
   @override
   void initState() {
@@ -19,21 +21,46 @@ class _IAMPageState extends State<IAMPage> {
     getAffirmations();
   }
 
-  Future<void> addLiked() async {}
+  Future<void> getDeviceId() async {
+    var deviceInfo = DeviceInfoPlugin();
+
+    if (Platform.isAndroid) {
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      print(androidInfo.id);
+      setState(() {
+        _deviceId = androidInfo.id;
+      });
+    } else if (Platform.isIOS) {
+      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      setState(() {
+        _deviceId = iosInfo.identifierForVendor ?? 'unknown';
+      });
+    }
+  }
+
+  Future<void> setFavourite() async {
+    var url = '';
+  }
 
   Future<void> getAffirmations() async {
     var url = 'http://10.0.2.2:3000/feed';
     final response = await http.get(Uri.parse(url));
-    final responseString = response.body
+    final listOfAffirmations = jsonDecode(response.body);
+    List<String> _dummyArray = [];
+
+    for (var i = 0; i < listOfAffirmations.length; i++) {
+      print(listOfAffirmations[i]['text']);
+      _dummyArray.add(listOfAffirmations[i]['text']);
+    }
+
     setState(() {
-      _affirmations.add(responseString);
-      _isFavorite.add(false); // Initialize favorite status for new affirmation
+      _affirmations = _dummyArray;
     });
   }
 
   void toggleFavorite(int index) {
     setState(() {
-      _isFavorite[index] = !_isFavorite[index];
+      _isFavorite = true;
     });
   }
 
@@ -78,7 +105,7 @@ class _IAMPageState extends State<IAMPage> {
                           Padding(
                             padding: const EdgeInsets.only(top: 20),
                             child: Icon(
-                              _isFavorite[index]
+                              _isFavorite
                                   ? Icons.favorite
                                   : Icons.favorite_border,
                               color: Colors.black,
