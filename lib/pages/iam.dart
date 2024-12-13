@@ -18,6 +18,7 @@ class _IAMPageState extends State<IAMPage> {
   @override
   void initState() {
     super.initState();
+    getDeviceId();
     getAffirmations();
   }
 
@@ -26,7 +27,6 @@ class _IAMPageState extends State<IAMPage> {
 
     if (Platform.isAndroid) {
       AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      print(androidInfo.id);
       setState(() {
         _deviceId = androidInfo.id;
       });
@@ -39,7 +39,16 @@ class _IAMPageState extends State<IAMPage> {
   }
 
   Future<void> setFavourite() async {
-    var url = '';
+    var url = 'http://10.0.2.2:3000/save';
+    var body = jsonEncode({'deviceId': _deviceId});
+
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: body,
+    );
   }
 
   Future<void> getAffirmations() async {

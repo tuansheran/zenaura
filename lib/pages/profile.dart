@@ -1,4 +1,7 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:zenaura/models/affirmation.dart';
 import 'package:zenaura/widgets/savedAffirmationCard.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -9,13 +12,41 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final List<String> affirmationTitles = [
-    'I am strong and capable.',
-    'I am worthy of love and respect.',
-    'I am in control of my life.',
-    'I am grateful for everything I have.',
-    'I am growing and learning every max outline.'
-  ];
+  String _deviceId = 'testdata';
+  List<AffirmationModle> affirmations = [];
+
+  @override
+  void initState() {
+    super.initState();
+    setUserAffirmations();
+  }
+
+  Future<void> setUserAffirmations() async {
+    var url = 'http://10.0.2.2:3000/savedAffirmations';
+    var fullUrl = '$url?deviceId=$_deviceId';
+    final response = await http.get(
+      Uri.parse(fullUrl),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> jsonResponse = jsonDecode(response.body);
+      List<AffirmationModle> fetchedAffirmations = jsonResponse.map((data) {
+        return AffirmationModle.fromJson(data);
+      }).toList();
+
+      setState(() {
+        affirmations = fetchedAffirmations;
+      });
+    } else {
+      // Handle the error
+      print('Failed to load affirmations');
+    }
+
+    print(response.body);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,10 +81,10 @@ class _ProfilePageState extends State<ProfilePage> {
             const SizedBox(height: 20),
             Expanded(
               child: ListView.builder(
-                itemCount: affirmationTitles.length,
+                itemCount: affirmations.length,
                 itemBuilder: (context, index) {
                   return SavedAffirmationCard(
-                    title: affirmationTitles[index],
+                    title: affirmations[index].text,
                   );
                 },
               ),
